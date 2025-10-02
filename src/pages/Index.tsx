@@ -21,6 +21,7 @@ import Newsletter from '@/components/Newsletter';
 import Footer from '@/components/Footer';
 import ChatBot from '@/components/ChatBot';
 import CustomCursor from '@/components/CustomCursor';
+import ScrollProgress from '@/components/ScrollProgress';
 import { useSmoothScroll } from '@/hooks/useSmoothScroll';
 
 const Index = () => {
@@ -61,6 +62,7 @@ const Index = () => {
         <Newsletter />
         <Footer />
         <ChatBot />
+        <ScrollProgress />
       </div>
     </>
   );

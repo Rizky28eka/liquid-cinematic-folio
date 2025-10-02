@@ -22,45 +22,74 @@ const Portfolio = () => {
     const items = gridRef.current?.querySelectorAll('.portfolio-item');
     if (!section || !items) return;
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       gsap.fromTo(
         item,
         {
-          clipPath: 'inset(100% 0 0 0)',
+          rotateX: -60,
+          rotateY: -20,
+          scale: 0.8,
           opacity: 0,
+          z: -200,
         },
         {
-          clipPath: 'inset(0% 0 0 0)',
+          rotateX: 0,
+          rotateY: 0,
+          scale: 1,
           opacity: 1,
-          duration: 1,
+          z: 0,
+          duration: 1.2,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: item,
-            start: 'top 80%',
+            start: 'top 85%',
             toggleActions: 'play none none reverse',
           },
         }
       );
 
-      // Magnetic image follow cursor
+      // 3D tilt and magnetic effect
       const handleMouseMove = (e: MouseEvent) => {
         const rect = (item as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -15;
+        const rotateY = ((x - centerX) / centerX) * 15;
+        const translateX = ((x - centerX) / centerX) * 10;
+        const translateY = ((y - centerY) / centerY) * 10;
+
+        gsap.to(item, {
+          rotateX,
+          rotateY,
+          x: translateX,
+          y: translateY,
+          duration: 0.4,
+          ease: 'power2.out',
+        });
 
         gsap.to(item.querySelector('.portfolio-image'), {
-          x: x * 0.1,
-          y: y * 0.1,
-          duration: 0.3,
+          scale: 1.05,
+          duration: 0.4,
           ease: 'power2.out',
         });
       };
 
       const handleMouseLeave = () => {
-        gsap.to(item.querySelector('.portfolio-image'), {
+        gsap.to(item, {
+          rotateX: 0,
+          rotateY: 0,
           x: 0,
           y: 0,
-          duration: 0.5,
+          duration: 0.6,
+          ease: 'elastic.out(1, 0.5)',
+        });
+
+        gsap.to(item.querySelector('.portfolio-image'), {
+          scale: 1,
+          duration: 0.6,
           ease: 'elastic.out(1, 0.5)',
         });
       };
@@ -83,10 +112,14 @@ const Portfolio = () => {
           {projects.map((project) => (
             <div
               key={project.id}
-              className="portfolio-item glass rounded-2xl overflow-hidden group cursor-pointer"
-              style={{ height: `${project.height}px` }}
+              className="portfolio-item glass rounded-2xl overflow-hidden group cursor-pointer transform-gpu"
+              style={{
+                height: `${project.height}px`,
+                perspective: '1000px',
+                transformStyle: 'preserve-3d',
+              }}
             >
-              <div className="portfolio-image relative w-full h-full p-8 flex flex-col justify-end">
+              <div className="portfolio-image relative w-full h-full p-8 flex flex-col justify-end transform-gpu">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <svg className="absolute inset-0 w-full h-full opacity-10 group-hover:opacity-20 transition-opacity" xmlns="http://www.w3.org/2000/svg">

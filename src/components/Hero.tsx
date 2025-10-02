@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,56 +11,100 @@ const Hero = () => {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+  const parallaxRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    const hero = heroRef.current;
+    const headline = headlineRef.current;
+    const parallax = parallaxRef.current;
+    if (!hero || !headline || !parallax) return;
+
+    // Parallax background
+    gsap.to(parallax, {
+      x: mousePosition.x * 30,
+      y: mousePosition.y * 30,
+      duration: 1,
+      ease: 'power2.out',
+    });
+  }, [mousePosition]);
 
   useEffect(() => {
     const hero = heroRef.current;
     const headline = headlineRef.current;
     if (!hero || !headline) return;
 
-    // Split text animation
+    // Split text animation with chars
     const text = headline.textContent || '';
-    const words = text.split(' ');
-    headline.innerHTML = words
-      .map((word) => `<span class="inline-block overflow-hidden"><span class="inline-block">${word}</span></span>`)
-      .join(' ');
+    const chars = text.split('');
+    headline.innerHTML = chars
+      .map((char) =>
+        char === ' '
+          ? '<span class="inline-block" style="width: 0.3em"></span>'
+          : `<span class="inline-block overflow-hidden"><span class="inline-block">${char}</span></span>`
+      )
+      .join('');
 
-    const wordElements = headline.querySelectorAll('span span');
+    const charElements = headline.querySelectorAll('span span');
 
     gsap.fromTo(
-      wordElements,
-      { y: 100, opacity: 0 },
+      charElements,
+      { y: 120, rotationX: -90, opacity: 0 },
       {
         y: 0,
+        rotationX: 0,
         opacity: 1,
-        stagger: 0.15,
-        duration: 1,
-        ease: 'power3.out',
+        stagger: 0.03,
+        duration: 1.2,
+        ease: 'power4.out',
         delay: 2.5,
       }
     );
 
     gsap.fromTo(
       sublineRef.current,
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 1, delay: 3.5, ease: 'power2.out' }
+      { opacity: 0, y: 30, filter: 'blur(10px)' },
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.2, delay: 3.8, ease: 'power3.out' }
     );
 
     gsap.fromTo(
       ctaRef.current,
-      { opacity: 0, scale: 0.8 },
-      { opacity: 1, scale: 1, duration: 0.8, delay: 4, ease: 'back.out(1.7)' }
+      { opacity: 0, scale: 0.5, rotateY: -180 },
+      { opacity: 1, scale: 1, rotateY: 0, duration: 1, delay: 4.5, ease: 'back.out(1.4)' }
     );
 
-    // Scroll-triggered scale
+    // Scroll-triggered parallax
     ScrollTrigger.create({
       trigger: hero,
       start: 'top top',
       end: 'bottom top',
-      scrub: 1,
+      scrub: 1.5,
       onUpdate: (self) => {
+        const progress = self.progress;
         gsap.to(headline, {
-          scale: 1 - self.progress * 0.1,
-          opacity: 1 - self.progress * 0.5,
+          scale: 1 - progress * 0.15,
+          opacity: 1 - progress * 0.7,
+          y: progress * 100,
+        });
+        gsap.to(sublineRef.current, {
+          opacity: 1 - progress * 0.9,
+          y: progress * 150,
+        });
+        gsap.to(ctaRef.current, {
+          opacity: 1 - progress * 1,
+          y: progress * 200,
         });
       },
     });
@@ -105,7 +150,7 @@ const Hero = () => {
       id="home"
       className="relative min-h-screen flex items-center justify-center noise-overlay overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-radial" />
+      <div ref={parallaxRef} className="absolute inset-0 bg-gradient-radial" />
       
       <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -136,12 +181,20 @@ const Hero = () => {
           Crafting cinematic interfaces with liquid glass aesthetics and seamless interactions
         </p>
         
-        <div ref={ctaRef}>
+        <div ref={ctaRef} className="flex gap-4">
           <Button
             size="lg"
-            className="glass-heavy px-8 py-6 text-lg font-medium ripple hover:scale-105 transition-transform"
+            className="glass-heavy px-8 py-6 text-lg font-medium ripple hover:scale-105 transition-transform group"
           >
             Explore Our Work
+            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="glass px-8 py-6 text-lg font-medium border-white/20 hover:border-white/40 hover:scale-105 transition-all"
+          >
+            View Projects
           </Button>
         </div>
       </div>

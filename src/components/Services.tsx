@@ -30,32 +30,66 @@ const Services = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Apply the scroll-triggered animation to the grid container
-  useScrollAnimation(gridRef, {
-    from: { opacity: 0, y: 100 },
-    to: { stagger: 0.1, duration: 0.8 },
-  });
+  useEffect(() => {
+    const section = sectionRef.current;
+    const cards = gridRef.current?.querySelectorAll('.service-card');
+    if (!section || !cards) return;
 
-  // Handle the 3D tilt effect separately
+    cards.forEach((card, index) => {
+      gsap.fromTo(
+        card,
+        {
+          opacity: 0,
+          y: 100,
+          rotateX: -45,
+          scale: 0.9,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          scale: 1,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        }
+      );
+    });
+  }, []);
+
   useEffect(() => {
     const cards = gridRef.current?.querySelectorAll('.service-card');
     if (!cards) return;
 
     cards.forEach((card) => {
+      const icon = card.querySelector('.service-icon');
+
       const handleMouseMove = (e: MouseEvent) => {
         const rect = (card as HTMLElement).getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -10;
-        const rotateY = ((x - centerX) / centerX) * 10;
+        const rotateX = ((y - centerY) / centerY) * -15;
+        const rotateY = ((x - centerX) / centerX) * 15;
 
         gsap.to(card, {
           rotateX,
           rotateY,
-          duration: 0.3,
+          scale: 1.05,
+          duration: 0.4,
           ease: 'power2.out',
+        });
+
+        gsap.to(icon, {
+          scale: 1.2,
+          rotate: 360,
+          duration: 0.6,
+          ease: 'back.out(1.7)',
         });
       };
 
@@ -63,8 +97,16 @@ const Services = () => {
         gsap.to(card, {
           rotateX: 0,
           rotateY: 0,
-          duration: 0.5,
-          ease: 'power2.out',
+          scale: 1,
+          duration: 0.6,
+          ease: 'elastic.out(1, 0.5)',
+        });
+
+        gsap.to(icon, {
+          scale: 1,
+          rotate: 0,
+          duration: 0.6,
+          ease: 'elastic.out(1, 0.5)',
         });
       };
 
@@ -92,10 +134,13 @@ const Services = () => {
           {services.map((service, index) => (
             <div
               key={index}
-              className="service-card glass p-8 rounded-2xl ripple hover:border-white/30 transition-all duration-300 group"
-              style={{ perspective: '1000px' }}
+              className="service-card glass p-8 rounded-2xl ripple hover:border-white/30 transition-all duration-300 group transform-gpu"
+              style={{
+                perspective: '1000px',
+                transformStyle: 'preserve-3d',
+              }}
             >
-              <div className="mb-6">
+              <div className="mb-6 service-icon transform-gpu">
                 <service.icon className="w-12 h-12 text-white/80 group-hover:text-white transition-colors" />
               </div>
               

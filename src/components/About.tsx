@@ -26,17 +26,59 @@ const About = () => {
 
     tl.fromTo(
       image,
-      { clipPath: 'circle(0% at 50% 50%)' },
-      { clipPath: 'circle(100% at 50% 50%)', duration: 1.2, ease: 'power3.inOut' }
+      {
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)',
+        scale: 1.3,
+        rotate: -5,
+      },
+      {
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+        scale: 1,
+        rotate: 0,
+        duration: 1.5,
+        ease: 'power4.inOut',
+      }
     );
 
     const textLines = text.querySelectorAll('p, h2');
-    tl.fromTo(
-      textLines,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, stagger: 0.2, duration: 0.8, ease: 'power2.out' },
-      '-=0.6'
-    );
+    textLines.forEach((line, index) => {
+      const chars = line.textContent?.split('') || [];
+      line.innerHTML = chars
+        .map((char) =>
+          char === ' '
+            ? '<span class="inline-block" style="width: 0.3em"></span>'
+            : `<span class="inline-block" style="display: inline-block">${char}</span>`
+        )
+        .join('');
+
+      const charElements = line.querySelectorAll('span');
+      tl.fromTo(
+        charElements,
+        { opacity: 0, y: 20, rotateX: -90 },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          stagger: 0.01,
+          duration: 0.6,
+          ease: 'power2.out',
+        },
+        index === 0 ? '-=1.2' : '-=0.5'
+      );
+    });
+
+    // Parallax on scroll
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top bottom',
+      end: 'bottom top',
+      scrub: 1,
+      onUpdate: (self) => {
+        gsap.to(image, {
+          y: -self.progress * 50,
+        });
+      },
+    });
   }, []);
 
   return (
@@ -47,7 +89,7 @@ const About = () => {
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          <div ref={imageRef} className="relative h-[600px] glass rounded-3xl overflow-hidden">
+          <div ref={imageRef} className="relative h-[600px] glass rounded-3xl overflow-hidden transform-gpu">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
             <div className="absolute inset-0 flex items-center justify-center text-6xl font-bold text-white/20">
               R2E
