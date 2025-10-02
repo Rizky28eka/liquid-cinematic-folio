@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { Sparkles, Layout, Code, Palette } from 'lucide-react';
+import { Sparkles, LayoutGrid as Layout, Code, Palette } from 'lucide-react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const services = [
