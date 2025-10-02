@@ -55,7 +55,7 @@ const Navbar = () => {
     });
   }, []);
 
-  const menuItems = ['Home', 'About', 'Services', 'Portfolio', 'Contact'];
+  const menuItems = ['Home', 'About', 'Services', 'Skills', 'Portfolio', 'Experience', 'Contact'];
 
   return (
     <nav
