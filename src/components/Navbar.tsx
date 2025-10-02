@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -8,10 +10,26 @@ const Navbar = () => {
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 80);
+
+      const sections = menuItems.map(item => item.toLowerCase());
+      const currentSection = sections.find(section => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+
+      if (currentSection) {
+        setActiveSection(currentSection);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -34,9 +52,12 @@ const Navbar = () => {
       end: 'max',
       onUpdate: (self) => {
         const progress = self.progress;
+        const isDark = document.documentElement.classList.contains('dark');
         gsap.to(nav, {
-          height: progress > 0 ? '60px' : '80px',
-          backgroundColor: progress > 0 ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.4)',
+          height: progress > 0 ? '70px' : '80px',
+          backgroundColor: progress > 0
+            ? (isDark ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)')
+            : (isDark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'),
           backdropFilter: progress > 0 ? 'blur(20px)' : 'blur(10px)',
           duration: 0.4,
           ease: 'power2.out',
@@ -130,24 +151,43 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
         <div
           ref={logoRef}
-          className="text-2xl font-bold tracking-tight cursor-pointer transform-gpu"
+          className="text-2xl font-bold tracking-tight cursor-pointer transform-gpu text-foreground"
         >
           r2e
         </div>
-        
-        <ul className="flex gap-8">
-          {menuItems.map((item) => (
-            <li key={item}>
-              <a
-                href={`#${item.toLowerCase()}`}
-                className="relative text-sm font-medium text-white/80 hover:text-white transition-colors"
-              >
-                <span className="link-text inline-block">{item}</span>
-                <span className="underline-anim absolute bottom-0 left-0 w-full h-0.5 bg-white scale-x-0" />
-              </a>
-            </li>
-          ))}
-        </ul>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-background/20 dark:bg-white/5 backdrop-blur-md rounded-full px-2 py-2 border border-foreground/10">
+            {menuItems.map((item) => {
+              const isActive = activeSection === item.toLowerCase();
+              return (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 transform-gpu ${
+                    isActive
+                      ? 'bg-foreground text-background shadow-lg scale-105'
+                      : 'text-foreground/70 hover:text-foreground hover:scale-105'
+                  }`}
+                >
+                  <span className="link-text inline-block">{item}</span>
+                </a>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            className="glass p-2 rounded-full hover:scale-110 transition-transform duration-300 border border-foreground/10"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-5 h-5 text-foreground" />
+            ) : (
+              <Moon className="w-5 h-5 text-foreground" />
+            )}
+          </button>
+        </div>
       </div>
     </nav>
   );

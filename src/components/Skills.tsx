@@ -5,12 +5,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const skills = [
-  { name: 'GSAP Animation', level: 95 },
-  { name: 'React/TypeScript', level: 92 },
-  { name: 'UI/UX Design', level: 88 },
-  { name: 'WebGL/Three.js', level: 85 },
-  { name: 'Motion Design', level: 90 },
-  { name: 'Performance Optimization', level: 87 },
+  { name: 'JavaScript', level: 95, icon: '🟨' },
+  { name: 'TypeScript', level: 92, icon: '🔷' },
+  { name: 'Python', level: 88, icon: '🐍' },
+  { name: 'Go', level: 85, icon: '🔵' },
+  { name: 'Rust', level: 82, icon: '🦀' },
+  { name: 'Java', level: 87, icon: '☕' },
+  { name: 'C++', level: 80, icon: '⚡' },
+  { name: 'PHP', level: 85, icon: '🐘' },
 ];
 
 const Skills = () => {
@@ -137,19 +139,22 @@ const Skills = () => {
           {skills.map((skill, index) => (
             <div
               key={index}
-              className="skill-item glass p-6 rounded-2xl transform-gpu cursor-pointer"
+              className="skill-item glass p-6 rounded-2xl transform-gpu cursor-pointer border border-foreground/10 hover:border-foreground/20 transition-colors"
               style={{ perspective: '1000px' }}
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-medium">{skill.name}</h3>
-                <span className="text-2xl font-bold">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{skill.icon}</span>
+                  <h3 className="text-xl font-medium text-foreground">{skill.name}</h3>
+                </div>
+                <span className="text-2xl font-bold text-foreground">
                   <span className="skill-counter">0</span>%
                 </span>
               </div>
 
-              <div className="relative h-3 bg-white/5 rounded-full overflow-hidden">
+              <div className="relative h-3 bg-foreground/10 dark:bg-white/5 rounded-full overflow-hidden">
                 <div
-                  className="progress-bar absolute inset-y-0 left-0 bg-gradient-to-r from-white to-white/60 rounded-full transform-gpu"
+                  className="progress-bar absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/60 rounded-full transform-gpu shadow-lg shadow-primary/50"
                   data-percentage={skill.level}
                   style={{ width: '0%' }}
                 >

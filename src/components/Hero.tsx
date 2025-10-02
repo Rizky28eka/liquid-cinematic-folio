@@ -169,22 +169,22 @@ const Hero = () => {
       <div className="relative z-10 text-center px-6 max-w-5xl">
         <h1
           ref={headlineRef}
-          className="text-7xl md:text-9xl font-bold mb-8 tracking-tighter"
+          className="text-7xl md:text-9xl font-bold mb-8 tracking-tighter text-foreground"
         >
           Premium Digital Experience
         </h1>
-        
+
         <p
           ref={sublineRef}
-          className="text-xl md:text-2xl text-white/60 mb-12 max-w-2xl mx-auto"
+          className="text-xl md:text-2xl text-foreground/60 mb-12 max-w-2xl mx-auto"
         >
           Crafting cinematic interfaces with liquid glass aesthetics and seamless interactions
         </p>
         
-        <div ref={ctaRef} className="flex gap-4">
+        <div ref={ctaRef} className="flex gap-4 justify-center flex-wrap">
           <Button
             size="lg"
-            className="glass-heavy px-8 py-6 text-lg font-medium ripple hover:scale-105 transition-transform group"
+            className="glass-heavy px-8 py-6 text-lg font-medium ripple hover:scale-105 transition-transform group bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50"
           >
             Explore Our Work
             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -192,7 +192,7 @@ const Hero = () => {
           <Button
             size="lg"
             variant="outline"
-            className="glass px-8 py-6 text-lg font-medium border-white/20 hover:border-white/40 hover:scale-105 transition-all"
+            className="glass px-8 py-6 text-lg font-medium border-foreground/20 hover:border-foreground/40 hover:scale-105 transition-all text-foreground"
           >
             View Projects
           </Button>

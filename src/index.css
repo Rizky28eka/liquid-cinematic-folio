@@ -6,60 +6,95 @@
 
 @layer base {
   :root {
-    /* Monochrome Base */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    
-    --card: 0 0% 6.7%;
-    --card-foreground: 0 0% 100%;
-    
-    --popover: 0 0% 4%;
-    --popover-foreground: 0 0% 100%;
-    
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
-    
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 100%;
-    
-    --muted: 0 0% 13.3%;
-    --muted-foreground: 0 0% 60%;
-    
-    --accent: 0 0% 13.3%;
+    /* Light Mode Colors */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 220 90% 56%;
     --accent-foreground: 0 0% 100%;
-    
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    
-    --border: 0 0% 13.3%;
-    --input: 0 0% 13.3%;
-    --ring: 0 0% 100%;
-    
+
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 220 90% 56%;
+
     --radius: 1rem;
-    
+
     /* Liquid Glass Tokens */
-    --glass-bg: 0 0% 100% / 0.05;
-    --glass-border: 0 0% 100% / 0.1;
+    --glass-bg: 0 0% 100% / 0.6;
+    --glass-border: 0 0% 0% / 0.1;
     --glass-blur: 20px;
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+
     /* Premium Gradients */
-    --gradient-radial: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
-    --gradient-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-    
+    --gradient-radial: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 70%);
+    --gradient-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+
     /* Animation Easings */
     --ease-cinematic: cubic-bezier(0.76, 0, 0.24, 1);
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.8s var(--ease-cinematic);
     --transition-base: 0.5s var(--ease-smooth);
-    
+
     /* Spacing Scale */
     --section-padding: 8rem;
   }
 
   .dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    /* Dark Mode Colors */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 6.7%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 13.3%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 220 90% 56%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 13.3%;
+    --input: 0 0% 13.3%;
+    --ring: 220 90% 56%;
+
+    /* Liquid Glass Tokens for Dark Mode */
+    --glass-bg: 0 0% 100% / 0.05;
+    --glass-border: 0 0% 100% / 0.1;
+    --glass-blur: 20px;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+    --gradient-radial: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+    --gradient-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
   }
 }
 
@@ -77,17 +112,27 @@
   
   /* Liquid Glass Effect */
   .glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: var(--glass-shadow);
   }
-  
+
+  .dark .glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
   .glass-heavy {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  .dark .glass-heavy {
+    background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
   }
   
