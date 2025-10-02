@@ -1,9 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sparkles, Layout, Code, Palette } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const services = [
   {
@@ -30,31 +28,19 @@ const services = [
 
 const Services = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
+  // Apply the scroll-triggered animation to the grid container
+  useScrollAnimation(gridRef, {
+    from: { opacity: 0, y: 100 },
+    to: { stagger: 0.1, duration: 0.8 },
+  });
+
+  // Handle the 3D tilt effect separately
   useEffect(() => {
-    const section = sectionRef.current;
-    const cards = cardsRef.current?.querySelectorAll('.service-card');
-    if (!section || !cards) return;
+    const cards = gridRef.current?.querySelectorAll('.service-card');
+    if (!cards) return;
 
-    gsap.fromTo(
-      cards,
-      { opacity: 0, y: 100 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 60%',
-          toggleActions: 'play none none reverse',
-        },
-      }
-    );
-
-    // 3D Tilt effect on hover
     cards.forEach((card) => {
       const handleMouseMove = (e: MouseEvent) => {
         const rect = (card as HTMLElement).getBoundingClientRect();
@@ -84,6 +70,12 @@ const Services = () => {
 
       card.addEventListener('mousemove', handleMouseMove as EventListener);
       card.addEventListener('mouseleave', handleMouseLeave);
+
+      // Cleanup function
+      return () => {
+        card.removeEventListener('mousemove', handleMouseMove as EventListener);
+        card.removeEventListener('mouseleave', handleMouseLeave);
+      };
     });
   }, []);
 
@@ -96,7 +88,7 @@ const Services = () => {
       <div className="max-w-7xl mx-auto">
         <h2 className="text-5xl font-bold mb-16 text-center">Our Services</h2>
         
-        <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <div
               key={index}
