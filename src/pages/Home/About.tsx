@@ -17,7 +17,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: 'easeOut',
+      ease: [0.76, 0, 0.24, 1] as const,
     },
   },
 };
@@ -29,7 +29,7 @@ const imageVariants = {
         scale: 1,
         transition: {
             duration: 0.8,
-            ease: [0.6, 0.05, -0.01, 0.9],
+            ease: [0.6, 0.05, -0.01, 0.9] as const,
         }
     }
 }

@@ -247,7 +247,7 @@ const ScrollProgress = () => {
       </div>
 
       {/* Ripple effect on click */}
-      <style jsx>{`
+      <style>{`
         @keyframes pulse {
           0%, 100% {
             opacity: 0.2;

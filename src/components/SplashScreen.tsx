@@ -14,7 +14,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       opacity: 0,
       transition: {
         duration: 1,
-        ease: 'easeInOut',
+        ease: [0.76, 0, 0.24, 1] as const,
         delay: 1.8
       },
     },
@@ -49,7 +49,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       scale: 1,
       transition: {
         duration: 1,
-        ease: 'easeOut',
+        ease: [0.76, 0, 0.24, 1] as const,
       },
     },
     exit: {
@@ -57,7 +57,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         y: -50,
         transition: {
             duration: 0.5,
-            ease: 'easeIn'
+            ease: [0.76, 0, 0.24, 1] as const
         }
     }
   };

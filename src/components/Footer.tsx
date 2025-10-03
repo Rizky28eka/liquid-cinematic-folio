@@ -1,38 +1,11 @@
 import { motion } from 'framer-motion';
 import { Github, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { staggerContainer, staggerItem, scaleIn, hoverScale, tapScale } from '@/lib/animations';
 
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: 'easeOut',
-    },
-  },
-};
-
-const socialIconVariants = {
-    hidden: { opacity: 0, scale: 0 },
-    visible: {
-        opacity: 1,
-        scale: 1,
-        transition: {
-            duration: 0.6,
-            ease: 'backOut'
-        }
-    }
-}
+const easings = {
+  easeOut: [0.76, 0, 0.24, 1],
+  backOut: [0.34, 1.56, 0.64, 1],
+} as const;
 
 const Footer = () => {
   const socialLinks = [
@@ -50,15 +23,15 @@ const Footer = () => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
-      variants={containerVariants}
+      variants={staggerContainer}
     >
       <div className="max-w-7xl mx-auto relative z-10">
         <motion.div
             className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 mb-12"
-            variants={containerVariants}
+            variants={staggerContainer}
         >
           {/* Brand Section */}
-          <motion.div variants={itemVariants}>
+          <motion.div variants={staggerItem}>
             <h3 className="text-3xl sm:text-4xl font-bold mb-4">
               r2e
             </h3>
@@ -68,7 +41,7 @@ const Footer = () => {
           </motion.div>
 
           {/* Quick Links */}
-          <motion.div variants={itemVariants}>
+          <motion.div variants={staggerItem}>
             <h4 className="text-lg font-bold mb-4">Quick Links</h4>
             <ul className="space-y-2.5">
               {quickLinks.map((item) => (
@@ -86,9 +59,9 @@ const Footer = () => {
           </motion.div>
 
           {/* Social Connect */}
-          <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-1">
+          <motion.div variants={staggerItem} className="sm:col-span-2 lg:col-span-1">
             <h4 className="text-lg font-bold mb-4">Connect</h4>
-            <motion.div className="flex gap-3 sm:gap-4" variants={containerVariants}>
+            <motion.div className="flex gap-3 sm:gap-4" variants={staggerContainer}>
               {socialLinks.map((social) => (
                 <motion.a
                   key={social.label}
@@ -96,12 +69,14 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  variants={socialIconVariants}
+                  variants={scaleIn}
                   whileHover={{
                       y: -4,
                       x: -4,
                       boxShadow: '4px 4px 0px 0px var(--foreground)',
+                      transition: { duration: 0.3, ease: easings.easeOut },
                   }}
+                  whileTap={tapScale}
                   className="group w-11 h-11 sm:w-12 sm:h-12 bg-foreground text-background rounded-full flex items-center justify-center transition-all duration-300"
                 >
                   <social.icon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -120,7 +95,7 @@ const Footer = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+            transition={{ duration: 0.8, ease: easings.easeOut }}
         >
           <p className="text-muted-foreground text-xs sm:text-sm">
             © 2025 R2E Studio. All rights reserved.

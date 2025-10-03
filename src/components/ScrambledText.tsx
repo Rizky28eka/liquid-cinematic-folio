@@ -7,7 +7,7 @@ interface ScrambledTextProps {
 }
 
 export const ScrambledText = ({ text, duration, className }: ScrambledTextProps) => {
-  const scrambledText = useScrambleText(text, duration);
+  const scrambled = useScramble(text, duration);
 
-  return <span className={className}>{scrambledText}</span>;
+  return <span className={className}>{scrambled}</span>;
 };
