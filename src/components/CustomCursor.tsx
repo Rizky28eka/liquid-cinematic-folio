@@ -65,11 +65,11 @@ const CustomCursor = () => {
         className="fixed top-0 left-0 w-12 h-12 pointer-events-none z-[9999] mix-blend-difference"
         style={{ transform: 'translate(-50%, -50%)' }}
       >
-        <div className="w-full h-full rounded-full border border-white opacity-30" />
+        <div className="w-full h-full rounded-full border border-foreground opacity-30" />
       </div>
       <div
         ref={cursorDotRef}
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-foreground rounded-full pointer-events-none z-[9999] mix-blend-difference"
         style={{ transform: 'translate(-50%, -50%)' }}
       />
     </>

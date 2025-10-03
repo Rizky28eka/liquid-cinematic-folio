@@ -1,195 +1,288 @@
-import { useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Moon, Sun } from 'lucide-react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
+import { Moon, Sun, Menu, X } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
-gsap.registerPlugin(ScrollTrigger);
-
 const Navbar = () => {
-  const navRef = useRef<HTMLElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
 
+  const menuItems = useMemo(() => [
+    { label: 'Home', id: 'home', isPage: false },
+    { label: 'About', id: 'about', isPage: false },
+    { label: 'Services', id: 'services', isPage: false },
+    { label: 'Skills', id: 'skills', isPage: false },
+    { label: 'Projects', id: 'projects', isPage: true },
+    { label: 'Experience', id: 'experience', isPage: false },
+    { label: 'Contact', id: 'contact', isPage: false }
+  ], []);
+
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 50);
+  });
+
+  // Active section detection on scroll
   useEffect(() => {
+    const sections = menuItems.filter(item => !item.isPage).map(item => document.getElementById(item.id));
+    
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
+        if (location.pathname !== '/') return;
 
-      const sections = menuItems.map(item => item.toLowerCase());
-      const currentSection = sections.find(section => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 100 && rect.bottom >= 100;
+        const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+        for (const section of sections) {
+            if (section && scrollPosition >= section.offsetTop && scrollPosition < section.offsetTop + section.offsetHeight) {
+                setActiveSection(section.id);
+                break;
+            }
         }
-        return false;
-      });
-
-      if (currentSection) {
-        setActiveSection(currentSection);
-      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, [location.pathname, menuItems]);
+
+
+  // Handle active section based on route
+  useEffect(() => {
+    if (location.pathname === '/projects') {
+      setActiveSection('projects');
+    } else if (location.pathname === '/') {
+        const hash = window.location.hash.replace('#', '');
+        setActiveSection(hash || 'home');
+    }
+  }, [location.pathname]);
+
+  // Smooth scroll to section
+  const scrollToSection = useCallback((sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 80, // Adjusted offset
+        behavior: 'smooth'
+      });
+    }
   }, []);
 
-  useEffect(() => {
-    const nav = navRef.current;
-    const logo = logoRef.current;
-    if (!nav || !logo) return;
+  const handleNavClick = useCallback((itemId: string, isPage: boolean) => {
+    setMobileMenuOpen(false);
+    if (!isPage) {
+      if (location.pathname !== '/') {
+        window.location.href = `/#${itemId}`;
+      } else {
+        scrollToSection(itemId);
+        setActiveSection(itemId);
+      }
+    }
+  }, [location.pathname, scrollToSection]);
 
-    gsap.fromTo(
-      nav,
-      { y: -100, skewY: 3, opacity: 0 },
-      { y: 0, skewY: 0, opacity: 1, duration: 1.2, ease: 'power4.out', delay: 2 }
+  const navVariants = {
+    initial: { y: -100, opacity: 0 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: 'easeOut',
+        delay: 0.3,
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const menuItemVariants = {
+    initial: { y: -20, opacity: 0 },
+    animate: { y: 0, opacity: 1 }
+  };
+
+  const mobileMenuVariants = {
+      initial: { opacity: 0, scale: 0.95, y: -20 },
+      animate: { opacity: 1, scale: 1, y: 0, transition: { staggerChildren: 0.05 } },
+      exit: { opacity: 0, scale: 0.95, y: -20 }
+  }
+
+  const renderNavLink = (item: typeof menuItems[0], isMobile = false) => {
+    const isActive = activeSection === item.id;
+    const baseClasses = isMobile
+      ? `block px-6 py-3 rounded-xl text-base font-medium transition-all duration-300 ${
+          isActive
+            ? 'bg-foreground text-background shadow-md'
+            : 'text-foreground/70 hover:text-foreground hover:bg-foreground/5'
+        }`
+      : `relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 transform-gpu ${
+          isActive
+            ? 'text-background'
+            : 'text-foreground/70 hover:text-foreground'
+        }`;
+
+    const linkContent = (
+        <>
+            <span className="relative z-10">{item.label}</span>
+            {isActive && !isMobile && (
+                <motion.div
+                    className="absolute inset-0 rounded-full bg-foreground"
+                    layoutId="active-nav-item"
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+            )}
+        </>
     );
 
-    ScrollTrigger.create({
-      start: 'top -80',
-      end: 'max',
-      onUpdate: (self) => {
-        const progress = self.progress;
-        const isDark = document.documentElement.classList.contains('dark');
-        gsap.to(nav, {
-          height: progress > 0 ? '70px' : '80px',
-          backgroundColor: progress > 0
-            ? (isDark ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)')
-            : (isDark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'),
-          backdropFilter: progress > 0 ? 'blur(20px)' : 'blur(10px)',
-          duration: 0.4,
-          ease: 'power2.out',
-        });
-        gsap.to(logo, {
-          scale: progress > 0 ? 0.9 : 1,
-          duration: 0.4,
-        });
-      },
-    });
+    if (item.isPage) {
+      return (
+        <motion.div key={item.id} variants={menuItemVariants}>
+            <Link
+              to={`/${item.id}`}
+              className={baseClasses}
+              onClick={() => setActiveSection(item.id)}
+            >
+              {linkContent}
+            </Link>
+        </motion.div>
+      );
+    }
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = logo.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-      const distance = Math.sqrt(x * x + y * y);
-
-      if (distance < 100) {
-        gsap.to(logo, {
-          x: x * 0.3,
-          y: y * 0.3,
-          scale: 1.1,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
-      }
-    };
-
-    const handleMouseLeave = () => {
-      gsap.to(logo, {
-        x: 0,
-        y: 0,
-        scale: scrolled ? 0.9 : 1,
-        duration: 0.6,
-        ease: 'elastic.out(1, 0.5)',
-      });
-    };
-
-    logo.addEventListener('mousemove', handleMouseMove);
-    logo.addEventListener('mouseleave', handleMouseLeave);
-
-    const links = nav.querySelectorAll('a');
-    links.forEach((link) => {
-      const underline = link.querySelector('.underline-anim') as HTMLElement;
-      const text = link.querySelector('.link-text') as HTMLElement;
-      if (!underline || !text) return;
-
-      link.addEventListener('mouseenter', () => {
-        gsap.to(underline, {
-          scaleX: 1,
-          transformOrigin: 'left',
-          duration: 0.5,
-          ease: 'power3.out',
-        });
-        gsap.to(text, {
-          y: -2,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
-      });
-
-      link.addEventListener('mouseleave', () => {
-        gsap.to(underline, {
-          scaleX: 0,
-          transformOrigin: 'right',
-          duration: 0.5,
-          ease: 'power3.out',
-        });
-        gsap.to(text, {
-          y: 0,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
-      });
-    });
-
-    return () => {
-      logo.removeEventListener('mousemove', handleMouseMove);
-      logo.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [scrolled]);
-
-  const menuItems = ['Home', 'About', 'Services', 'Skills', 'Portfolio', 'Experience', 'Contact'];
+    return (
+      <motion.div key={item.id} variants={menuItemVariants}>
+        <a
+            href={`#${item.id}`}
+            className={baseClasses}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick(item.id, false);
+            }}
+        >
+            {linkContent}
+        </a>
+      </motion.div>
+    );
+  };
 
   return (
-    <nav
-      ref={navRef}
-      className="fixed top-0 left-0 right-0 z-40 glass transition-all duration-300"
-      style={{ height: '80px' }}
-    >
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-        <div
-          ref={logoRef}
-          className="text-2xl font-bold tracking-tight cursor-pointer transform-gpu text-foreground"
-        >
-          r2e
-        </div>
+    <>
+      <motion.nav
+        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? 'py-3 bg-background/80 backdrop-blur-lg border-border'
+            : 'py-4 bg-transparent border-transparent'
+        }`}
+        variants={navVariants}
+        initial="initial"
+        animate="animate"
+      >
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" onClick={() => setActiveSection('home')}>
+            <motion.div
+              className="text-2xl font-bold tracking-tight cursor-pointer text-foreground"
+              whileHover={{ scale: 1.1, rotate: -5 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+            >
+              r2e
+            </motion.div>
+          </Link>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-background/20 dark:bg-white/5 backdrop-blur-md rounded-full px-2 py-2 border border-foreground/10">
-            {menuItems.map((item) => {
-              const isActive = activeSection === item.toLowerCase();
-              return (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 transform-gpu ${
-                    isActive
-                      ? 'bg-foreground text-background shadow-lg scale-105'
-                      : 'text-foreground/70 hover:text-foreground hover:scale-105'
-                  }`}
+          {/* Desktop Menu */}
+          <motion.div className="hidden lg:flex items-center gap-4" variants={navVariants}>
+            <div className="flex items-center gap-1 bg-card/60 backdrop-blur-md rounded-full px-2 py-2 border border-border shadow-sm">
+              {menuItems.map((item) => renderNavLink(item))}
+            </div>
+
+            {/* Theme Toggle */}
+            <motion.button
+              onClick={toggleTheme}
+              className="bg-card/60 backdrop-blur-md p-2.5 rounded-full border border-border shadow-sm"
+              aria-label="Toggle theme"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                    key={theme}
+                    initial={{ y: -20, opacity: 0, rotate: theme === 'dark' ? 90 : -90 }}
+                    animate={{ y: 0, opacity: 1, rotate: 0 }}
+                    exit={{ y: 20, opacity: 0, rotate: theme === 'dark' ? -90 : 90 }}
+                    transition={{ duration: 0.3 }}
                 >
-                  <span className="link-text inline-block">{item}</span>
-                </a>
-              );
-            })}
-          </div>
+                    {theme === 'dark' ? (
+                        <Sun className="w-5 h-5 text-foreground" />
+                    ) : (
+                        <Moon className="w-5 h-5 text-foreground" />
+                    )}
+                </motion.div>
+              </AnimatePresence>
+            </motion.button>
+          </motion.div>
 
-          <button
-            onClick={toggleTheme}
-            className="glass p-2 rounded-full hover:scale-110 transition-transform duration-300 border border-foreground/10"
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-5 h-5 text-foreground" />
-            ) : (
-              <Moon className="w-5 h-5 text-foreground" />
-            )}
-          </button>
+          {/* Mobile Menu Button */}
+          <div className="flex lg:hidden items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="bg-card/60 backdrop-blur-md p-2.5 rounded-full border border-border"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5 text-foreground" />
+              ) : (
+                <Moon className="w-5 h-5 text-foreground" />
+              )}
+            </button>
+            
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="bg-card/60 backdrop-blur-md p-2.5 rounded-full border border-border"
+              aria-label="Toggle menu"
+            >
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={mobileMenuOpen ? 'x' : 'menu'}
+                        initial={{ rotate: 45, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: -45, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        {mobileMenuOpen ? (
+                            <X className="w-5 h-5 text-foreground" />
+                        ) : (
+                            <Menu className="w-5 h-5 text-foreground" />
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </motion.nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+            <div className="fixed inset-0 z-40 lg:hidden">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+                <motion.div
+                    className="absolute top-24 right-4 left-4 bg-card rounded-2xl shadow-2xl border border-border p-4 space-y-2"
+                    variants={mobileMenuVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                >
+                    {menuItems.map((item) => renderNavLink(item, true))}
+                </motion.div>
+            </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

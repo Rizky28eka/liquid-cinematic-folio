@@ -1,136 +1,133 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { motion } from 'framer-motion';
 import { Github, Twitter, Linkedin, Instagram } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: 'easeOut',
+    },
+  },
+};
+
+const socialIconVariants = {
+    hidden: { opacity: 0, scale: 0 },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+            duration: 0.6,
+            ease: 'backOut'
+        }
+    }
+}
 
 const Footer = () => {
-  const footerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const footer = footerRef.current;
-    if (!footer) return;
-
-    gsap.fromTo(
-      footer,
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: footer,
-          start: 'top 90%',
-          toggleActions: 'play none none reverse',
-        },
-      }
-    );
-
-    // Link underline animation
-    const links = footer.querySelectorAll('a');
-    links.forEach((link) => {
-      const underline = document.createElement('span');
-      underline.className = 'absolute bottom-0 left-0 w-full h-px bg-white scale-x-0 transition-transform duration-300';
-      link.style.position = 'relative';
-      link.appendChild(underline);
-
-      link.addEventListener('mouseenter', () => {
-        gsap.to(underline, {
-          scaleX: 1,
-          transformOrigin: 'left',
-          duration: 0.3,
-        });
-      });
-
-      link.addEventListener('mouseleave', () => {
-        gsap.to(underline, {
-          scaleX: 0,
-          transformOrigin: 'right',
-          duration: 0.3,
-        });
-      });
-    });
-  }, []);
-
   const socialLinks = [
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Instagram, href: '#', label: 'Instagram' },
+    { icon: Github, href: 'https://github.com', label: 'GitHub' },
+    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+    { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+    { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
   ];
 
-  return (
-    <footer
-      ref={footerRef}
-      className="relative py-16 px-6 glass-heavy border-t border-white/10 noise-overlay"
-    >
-      <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="footerRipple">
-            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2">
-              <animate
-                attributeName="baseFrequency"
-                from="0.015"
-                to="0.025"
-                dur="8s"
-                repeatCount="indefinite"
-              />
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" scale="10" />
-          </filter>
-        </defs>
-        <rect width="100%" height="100%" filter="url(#footerRipple)" />
-      </svg>
+  const quickLinks = ['Home', 'About', 'Services', 'Portfolio', 'Contact'];
 
+  return (
+    <motion.footer
+      className="relative py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-background text-foreground border-t-4 border-foreground"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={containerVariants}
+    >
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid md:grid-cols-3 gap-12 mb-12">
-          <div>
-            <h3 className="text-2xl font-bold mb-4">r2e</h3>
-            <p className="text-white/60">
-              Premium digital experiences with liquid glass aesthetics and cinematic animations.
+        <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 mb-12"
+            variants={containerVariants}
+        >
+          {/* Brand Section */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-3xl sm:text-4xl font-bold mb-4">
+              r2e
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">
+              Premium digital experiences with black & white aesthetics and modern animations.
             </p>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              {['Home', 'About', 'Services', 'Portfolio', 'Contact'].map((item) => (
+          </motion.div>
+
+          {/* Quick Links */}
+          <motion.div variants={itemVariants}>
+            <h4 className="text-lg font-bold mb-4">Quick Links</h4>
+            <ul className="space-y-2.5">
+              {quickLinks.map((item) => (
                 <li key={item}>
                   <a
                     href={`#${item.toLowerCase()}`}
-                    className="text-white/60 hover:text-white transition-colors inline-block"
+                    className="text-muted-foreground hover:text-foreground transition-colors inline-block text-sm sm:text-base relative group"
                   >
                     {item}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-foreground group-hover:w-full transition-all duration-300"></span>
                   </a>
                 </li>
               ))}
             </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold mb-4">Connect</h4>
-            <div className="flex gap-4">
+          </motion.div>
+
+          {/* Social Connect */}
+          <motion.div variants={itemVariants} className="sm:col-span-2 lg:col-span-1">
+            <h4 className="text-lg font-bold mb-4">Connect</h4>
+            <motion.div className="flex gap-3 sm:gap-4" variants={containerVariants}>
               {socialLinks.map((social) => (
-                <a
+                <motion.a
                   key={social.label}
                   href={social.href}
-                  className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
+                  variants={socialIconVariants}
+                  whileHover={{
+                      y: -4,
+                      x: -4,
+                      boxShadow: '4px 4px 0px 0px var(--foreground)',
+                  }}
+                  className="group w-11 h-11 sm:w-12 sm:h-12 bg-foreground text-background rounded-full flex items-center justify-center transition-all duration-300"
                 >
-                  <social.icon className="w-5 h-5" />
-                </a>
+                  <social.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                </motion.a>
               ))}
-            </div>
-          </div>
-        </div>
-        
-        <div className="pt-8 border-t border-white/10 text-center text-sm text-white/40">
-          <p>© 2025 R2E Studio. All rights reserved.</p>
-        </div>
+            </motion.div>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-4">
+              Follow me on social media
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* Copyright */}
+        <motion.div
+            className="pt-8 border-t-2 border-border text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <p className="text-muted-foreground text-xs sm:text-sm">
+            © 2025 R2E Studio. All rights reserved.
+          </p>
+        </motion.div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 

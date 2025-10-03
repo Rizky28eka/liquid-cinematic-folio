@@ -1,83 +1,95 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
 const SplashScreen = ({ onComplete }: SplashScreenProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
+  const text = 'rizky28eka';
+
+  const containerVariants = {
+    initial: { opacity: 1 },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 1,
+        ease: 'easeInOut',
+        delay: 1.8
+      },
+    },
+  };
+
+  const logoVariants = {
+    initial: {},
+    animate: {
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+    exit: {
+        transition: {
+            staggerChildren: 0.05,
+            staggerDirection: -1
+        }
+    }
+  };
+
+  const charVariants = {
+    initial: {
+      opacity: 0,
+      y: 50,
+      skewX: -30,
+      scale: 1.5,
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+      skewX: 0,
+      scale: 1,
+      transition: {
+        duration: 1,
+        ease: 'easeOut',
+      },
+    },
+    exit: {
+        opacity: 0,
+        y: -50,
+        transition: {
+            duration: 0.5,
+            ease: 'easeIn'
+        }
+    }
+  };
 
   useEffect(() => {
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setTimeout(onComplete, 500);
-      },
-    });
-
-    tl.fromTo(
-      logoRef.current,
-      {
-        scale: 0.7,
-        opacity: 0,
-      },
-      {
-        scale: 1.2,
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power3.out',
-      }
-    )
-      .to(logoRef.current, {
-        scale: 1,
-        duration: 0.4,
-        ease: 'power2.inOut',
-      })
-      .to(
-        containerRef.current,
-        {
-          clipPath: 'circle(0% at 50% 50%)',
-          duration: 1.2,
-          ease: 'power4.inOut',
-        },
-        '+=0.5'
-      );
+    const timer = setTimeout(() => onComplete(), 3300); // Total animation time + delay
+    return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 bg-black z-50 flex items-center justify-center noise-overlay"
-      style={{ clipPath: 'circle(150% at 50% 50%)' }}
+    <motion.div
+      className="fixed inset-0 bg-background z-50 flex items-center justify-center"
+      variants={containerVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
     >
-      <div className="absolute inset-0 bg-gradient-radial" />
-      
-      <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="rippleFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3">
-              <animate
-                attributeName="baseFrequency"
-                from="0.01"
-                to="0.03"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" scale="20" />
-          </filter>
-        </defs>
-        <rect width="100%" height="100%" filter="url(#rippleFilter)" />
-      </svg>
-
-      <div
-        ref={logoRef}
-        className="relative z-10 text-white text-8xl font-bold tracking-tighter"
+      <motion.div
+        className="relative z-10 text-foreground text-6xl md:text-8xl font-bold tracking-tighter"
+        variants={logoVariants}
       >
-        r2e
-      </div>
-    </div>
+        {text.split('').map((char, index) => (
+          <motion.span
+            key={index}
+            className="char inline-block"
+            variants={charVariants}
+          >
+            {char}
+          </motion.span>
+        ))}
+      </motion.div>
+    </motion.div>
   );
 };
 
